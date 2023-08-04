@@ -28,13 +28,28 @@ const Login = ({ navigation }) => {
     setPassword("");
   };
 
-  const validation = (emailUser, passwordUser) => {
+  const validation = () => {
     if (!email || !password) {
-      Alert.alert("", `Please fill all fields`);
+      Alert.alert("Mohon isi semua data");
       return false;
-    } else {
-      return true;
     }
+
+    if (email.trim() === "" || password.trim() === "") {
+      Alert.alert("Mohon isi password dengan benar");
+      return false;
+    }
+
+    if (!email.includes("@")) {
+      Alert.alert("Harap memasukan email yang benar");
+      return false;
+    }
+
+    if (password.length <= 8) {
+      Alert.alert("Mohon isi password minimal 8 huruf");
+      return false;
+    }
+
+    return true;
   };
 
   useEffect(() => {
@@ -47,27 +62,33 @@ const Login = ({ navigation }) => {
   }, []);
 
   const handleLogin = () => {
-    signInWithEmailAndPassword(auth, email, password)
-      .then((userCredentials) => {
-        if (validation(email, password)) {
+    if (validation()) {
+      signInWithEmailAndPassword(auth, email, password)
+        .then((userCredentials) => {
           reset();
           Alert.alert("Kamu berhasil login");
-          navigation.replace("Home");
-        }
-      })
-      .catch((error) => alert(error.message));
+          return navigation.replace("Home");
+        })
+        .catch((error) => alert(error.message));
+    }
   };
   const handleRegister = () => {
-    createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredentials) => {
-        if (validation(email, password)) {
+    if (validation()) {
+      createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredentials) => {
           reset();
-
           Alert.alert("Kamu berhasil mendaftar");
           navigation.replace("Home");
-        }
-      })
-      .catch((error) => alert(error.message));
+        })
+        .catch((error) => {
+          if (error.message == "Firebase: Error (auth/email-already-in-use).") {
+            Alert.alert("Email sudah digunakan!");
+          } else {
+            console.log(error.message);
+            Alert.alert(error.message);
+          }
+        });
+    }
   };
 
   return (

@@ -1,14 +1,24 @@
 import { Alert, Button, StyleSheet, Text, View } from "react-native";
-import React, { useEffect, useState } from "react";
-import { getAuth, signOut } from "firebase/auth";
+import React, { useEffect } from "react";
+import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
 
 const Home = ({ navigation }) => {
-  const [auth, setAuth] = useState();
+  // const [auth, setAuth] = useState();
+
+  const auth = getAuth();
+  // const cekUser = () => {
+  //   onAuthStateChanged(auth, (user) => {
+  //     if (!user) {
+  //       navigation.replace("Login");
+  //       Alert.alert("Kamu belum login, silahkan login terlebih dahulu");
+  //     }
+  //   });
+  // };
+
+  // cekUser();
 
   useEffect(() => {
-    setAuth(getAuth());
-
-    if (!auth) {
+    if (auth.currentUser == null) {
       Alert.alert("Kamu belum login, silahkan login terlebih dahulu");
       navigation.replace("Login");
     }
@@ -16,8 +26,8 @@ const Home = ({ navigation }) => {
 
   const handleLogout = () => {
     signOut(auth);
-    Alert.alert("Kamu berhasil logout");
     navigation.replace("Login");
+    Alert.alert("Kamu berhasil logout");
   };
 
   return (
